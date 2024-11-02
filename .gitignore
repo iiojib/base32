@@ -1,2 +1,4 @@
-node_modules
+.devcontainer
+.vscode
 tmp
+deno.lock

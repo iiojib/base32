@@ -1,0 +1,7 @@
+{
+  "exports": "./index.ts",
+  "lock": false,
+  "fmt": {
+    "lineWidth": 120
+  }
+}
