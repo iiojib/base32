@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "CommonJS",
+    "lib": ["ES2015", "DOM"],
+    "skipLibCheck": true
+  },
+
+  "include": ["index.ts"]
+}

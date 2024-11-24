@@ -1,9 +1,15 @@
+// Standard Base32 alphabet as per RFC 4648[6]
 export const BASE32_RFC4648_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+// Base32 alphabet with extended hexadecimal characters as per RFC 4648[7]
 export const BASE32_RFC4648_HEX_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
 
 export type EncodingOptions = {
+  // If true, the encoding will be case-sensitive
   caseSensitive?: boolean;
+  // Optional alias table for character substitution
   aliasTable?: Record<string, string>;
+  // Padding character, default is '='
   padding?: string;
 };
 
@@ -15,6 +21,23 @@ export type Base32Encoding = {
   decode: Decode;
 };
 
+export class InvalidAlphabetError extends Error {
+  override name = "InvalidAlphabetError";
+}
+
+export class InvalidAliasTableError extends Error {
+  override name = "InvalidAliasTableError";
+}
+
+export class InvalidPaddingError extends Error {
+  override name = "InvalidPaddingError";
+}
+
+export class InvalidBase32StringError extends Error {
+  override name = "InvalidBase32StringError";
+}
+
+// Factory function to create a Base32 encoding object with a given alphabet and options
 export const makeBase32Encoding = (
   alphabet: string,
   options?: EncodingOptions,
@@ -28,13 +51,15 @@ export const makeBase32Encoding = (
   const utf8Encoder = new TextEncoder();
 
   if (!caseSensitive) {
+    // Convert alphabet to uppercase if case sensitivity is not required
     alphabet = alphabet.toUpperCase();
   }
 
   if (new Set(utf8Encoder.encode(alphabet)).size !== 32) {
-    throw new Error("The alphabet must contain exactly 32 unique single-byte characters");
+    throw new InvalidAlphabetError("The alphabet must contain exactly 32 unique single-byte characters");
   }
 
+  // Create a lookup table for decoding
   const table: Record<string, number> = {};
 
   for (let i = 0; i < alphabet.length; i++) {
@@ -47,6 +72,7 @@ export const makeBase32Encoding = (
 
   if (aliasTable) {
     for (const alias in aliasTable) {
+      // Skip inherited properties
       if (!Object.prototype.hasOwnProperty.call(aliasTable, alias)) {
         continue;
       }
@@ -54,14 +80,14 @@ export const makeBase32Encoding = (
       const value = aliasTable[alias];
 
       if (utf8Encoder.encode(alias).length !== 1 || !(value in table)) {
-        throw new Error(
+        throw new InvalidAliasTableError(
           "Alias should be a single character and value should be a valid character in the alphabet",
         );
       }
 
       if (caseSensitive) {
         if (alias in table) {
-          throw new Error("Alias should not be present in the alphabet");
+          throw new InvalidAliasTableError("Alias should not be present in the alphabet");
         }
 
         table[alias] = table[value];
@@ -70,7 +96,7 @@ export const makeBase32Encoding = (
         const lower = alias.toLowerCase();
 
         if (upper in table || lower in table) {
-          throw new Error("Alias should not be present in the alphabet");
+          throw new InvalidAliasTableError("Alias should not be present in the alphabet");
         }
 
         table[upper] = table[lower] = table[value];
@@ -79,7 +105,7 @@ export const makeBase32Encoding = (
   }
 
   if (utf8Encoder.encode(padding).length !== 1 || padding in table) {
-    throw new Error("Padding character should be a single character and not present in the alphabet");
+    throw new InvalidPaddingError("Padding character should be a single character and not present in the alphabet");
   }
 
   const encode = (source: Uint8Array, withPadding?: boolean): string => {
@@ -89,23 +115,27 @@ export const makeBase32Encoding = (
       return str;
     }
 
+    // Read the first byte
     let buff = source[0];
     let size = 8;
     let index = 1;
 
     while (true) {
+      // Append the next 5-bit chunk to the output string
       str += alphabet[(buff >>> (size - 5)) & 0x1f];
       size -= 5;
 
       if (size < 5) {
         if (index === source.length) {
           if (size > 0) {
+            // Append the remaining bits
             str += alphabet[(buff << (5 - size)) & 0x1f];
           }
 
           break;
         }
 
+        // Read the next byte
         buff = (buff << 8) | source[index];
         size += 8;
         index += 1;
@@ -113,6 +143,7 @@ export const makeBase32Encoding = (
     }
 
     if (withPadding) {
+      // Add padding characters
       str += padding.repeat(8 - str.length % 8 & 0b111);
     }
 
@@ -122,6 +153,7 @@ export const makeBase32Encoding = (
   const decode = (source: string): Uint8Array => {
     let length = source.length;
 
+    // Remove padding characters
     while (source[length - 1] === padding) {
       length -= 1;
     }
@@ -140,13 +172,15 @@ export const makeBase32Encoding = (
       const value = table[source[index]];
 
       if (value === undefined) {
-        throw new Error(`Character "${source[index]}" not found in the alphabet`);
+        throw new InvalidBase32StringError(`Character "${source[index]}" not found in the alphabet`);
       }
 
+      // Append the next 5-bit chunk to the buffer
       buff = (buff << 5) | value;
       size += 5;
 
       if (size >= 8) {
+        // Append the next byte to the output array
         bytes[byteIndex] = (buff >>> (size - 8)) & 0xff;
         size -= 8;
         byteIndex += 1;
@@ -154,7 +188,7 @@ export const makeBase32Encoding = (
     }
 
     if ((buff & ((1 << size) - 1)) !== 0) {
-      throw new Error("Input string contains incomplete bytes");
+      throw new InvalidBase32StringError("Input string contains incomplete bytes");
     }
 
     return bytes;
@@ -163,5 +197,5 @@ export const makeBase32Encoding = (
   return { encode, decode };
 };
 
-export const Base32 = makeBase32Encoding(BASE32_RFC4648_ALPHABET);
-export const Base32Hex = makeBase32Encoding(BASE32_RFC4648_HEX_ALPHABET);
+export const Base32: Base32Encoding = makeBase32Encoding(BASE32_RFC4648_ALPHABET);
+export const Base32Hex: Base32Encoding = makeBase32Encoding(BASE32_RFC4648_HEX_ALPHABET);

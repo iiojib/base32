@@ -16,6 +16,7 @@ import {
 const utf8Encoder = new TextEncoder();
 const utf8Decoder = new TextDecoder();
 
+// See https://tools.ietf.org/html/rfc4648#section-10
 describe("RFC 4648 Test Vectors", () => {
   const vectors = [
     { input: "", base32: "", base32hex: "" },
@@ -125,10 +126,12 @@ describe("makeBase32Encoding", () => {
 
   test("invalid alphabet", () => {
     expect(() => makeBase32Encoding("abc")).toThrow(InvalidAlphabetError);
+    // Non single-byte character
     expect(() => makeBase32Encoding("ybndrfg8ejkmcpqxot1uwisza345h76💩")).toThrow(InvalidAlphabetError);
   });
 
   test("aliases", () => {
+    // Crockford's Base32 alphabet with aliases for similar characters
     const crockfordAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
     const aliasTable = { "O": "0", "I": "1", "L": "1" };
     const base32 = makeBase32Encoding(crockfordAlphabet, { aliasTable });
@@ -151,6 +154,7 @@ describe("makeBase32Encoding", () => {
   });
 
   test("case-sensitive aliases", () => {
+    // Crockford's Base32 alphabet with aliases for similar characters
     const crockfordAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
     const aliasTable = { "O": "0", "I": "1", "L": "1" };
     const base32 = makeBase32Encoding(crockfordAlphabet, { aliasTable, caseSensitive: true });
