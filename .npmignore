@@ -1,0 +1,11 @@
+.devcontainer
+.vscode
+.github
+tmp
+coverage
+package-lock.json
+deno.json
+deno.lock
+*.ts
+!*.d.ts
+tsconfig.*

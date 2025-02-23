@@ -1,4 +1,7 @@
 {
+  "name": "@iiojib/base32",
+  "version": "1.0.0",
+  "description": "Base32 encoding and decoding",
   "type": "module",
   "sideEffects": false,
   "main": "./index.cjs",
@@ -16,6 +19,12 @@
     "build:esm": "tsc --project tsconfig.esm.json && mv index.js index.mjs",
     "build:cjs": "tsc --project tsconfig.cjs.json && mv index.js index.cjs",
     "build": "npm run build:esm && npm run build:cjs"
+  },
+  "author": "iiojib <iiojib.vi@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iiojib/base32"
   },
   "devDependencies": {
     "typescript": "^5.7.3"
