@@ -5,7 +5,8 @@
     "target": "ES2015",
     "module": "ES2015",
     "lib": ["ES2015", "DOM"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true
   },
 
   "include": ["index.ts"]
