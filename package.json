@@ -26,6 +26,16 @@
     "type": "git",
     "url": "https://github.com/iiojib/base32"
   },
+  "keywords": [
+    "base32",
+    "base32hex",
+    "encode",
+    "decode",
+    "encoding",
+    "decoding",
+    "rfc4648",
+    "rfc3548"
+  ],
   "devDependencies": {
     "typescript": "^5.7.3"
   }
