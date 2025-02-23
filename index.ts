@@ -1,43 +1,51 @@
-// Standard Base32 alphabet as per RFC 4648[6]
+/** Standard Base32 alphabet as per RFC 4648[6] */
 export const BASE32_RFC4648_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
-// Base32 alphabet with extended hexadecimal characters as per RFC 4648[7]
+/** Base32 alphabet with extended hexadecimal characters as per RFC 4648[7] */
 export const BASE32_RFC4648_HEX_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
 
+/** Encoding options for Base32 encoding */
 export type EncodingOptions = {
-  // If true, the encoding will be case-sensitive
+  /** If true, the encoding will be case-sensitive */
   caseSensitive?: boolean;
-  // Optional alias table for character substitution
+  /** Optional alias table for character substitution */
   aliasTable?: Record<string, string>;
-  // Padding character, default is '='
+  /** Padding character, default is '=' */
   padding?: string;
 };
 
+/** Encode function signature */
 export type Encode = (source: Uint8Array, withPadding?: boolean) => string;
+/** Decode function signature */
 export type Decode = (source: string) => Uint8Array;
 
+/** Base32 encoding type */
 export type Base32Encoding = {
   encode: Encode;
   decode: Decode;
 };
 
+/** Error thrown when the alphabet is invalid */
 export class InvalidAlphabetError extends Error {
   override name = "InvalidAlphabetError";
 }
 
+/** Error thrown when the alias table is invalid */
 export class InvalidAliasTableError extends Error {
   override name = "InvalidAliasTableError";
 }
 
+/** Error thrown when the padding character is invalid */
 export class InvalidPaddingError extends Error {
   override name = "InvalidPaddingError";
 }
 
+/** Error thrown when the input string is invalid */
 export class InvalidBase32StringError extends Error {
   override name = "InvalidBase32StringError";
 }
 
-// Factory function to create a Base32 encoding object with a given alphabet and options
+/** Factory function to create a Base32 encoding object with a given alphabet and options */
 export const makeBase32Encoding = (
   alphabet: string,
   options?: EncodingOptions,
@@ -197,5 +205,8 @@ export const makeBase32Encoding = (
   return { encode, decode };
 };
 
+/** Standard Base32 encoding */
 export const Base32: Base32Encoding = makeBase32Encoding(BASE32_RFC4648_ALPHABET);
+
+/** Base32 encoding with extended hexadecimal characters */
 export const Base32Hex: Base32Encoding = makeBase32Encoding(BASE32_RFC4648_HEX_ALPHABET);
