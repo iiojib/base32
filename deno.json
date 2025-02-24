@@ -12,6 +12,7 @@
     ]
   },
   "lock": false,
+  "vendor": true,
   "fmt": {
     "lineWidth": 120
   }
