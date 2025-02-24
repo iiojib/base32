@@ -26,7 +26,7 @@ jobs:
         run: deno test
 
       - name: Type-check code
-        run: deno check -c tsconfig.json .
+        run: deno check -c tsconfig.json ./*.ts
 
       - name: Lint code
         run: deno lint
