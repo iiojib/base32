@@ -25,23 +25,28 @@ export type Base32Encoding = {
   decode: Decode;
 };
 
+/** Base class for Base32 errors */
+export class Base32Error extends Error {
+  override name = "Base32Error";
+}
+
 /** Error thrown when the alphabet is invalid */
-export class InvalidAlphabetError extends Error {
+export class InvalidAlphabetError extends Base32Error {
   override name = "InvalidAlphabetError";
 }
 
 /** Error thrown when the alias table is invalid */
-export class InvalidAliasTableError extends Error {
+export class InvalidAliasTableError extends Base32Error {
   override name = "InvalidAliasTableError";
 }
 
 /** Error thrown when the padding character is invalid */
-export class InvalidPaddingError extends Error {
+export class InvalidPaddingError extends Base32Error {
   override name = "InvalidPaddingError";
 }
 
 /** Error thrown when the input string is invalid */
-export class InvalidBase32StringError extends Error {
+export class InvalidBase32StringError extends Base32Error {
   override name = "InvalidBase32StringError";
 }
 
